@@ -1,3 +1,30 @@
 #!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
 require "asca"
+
+#https://apidock.com/ruby/OptionParser
+require "optparse"
+
+require 'optparse'
+
+options = {}
+option_parser = OptionParser.new do |opts|
+  opts.banner = 'This is an apple connect api wrapper cli.'
+
+  opts.on('-a action-name', '--action action-name', 'profile-install, profile-download') do |value|
+    options[:action] = value
+  end
+  opts.on('-n name', '--name name', 'Profile name') do |value|
+    options[:profile_name] = value
+  end
+end.parse!
+
+case options[:action]
+when 'profile-download'
+    Asca::Profiles.download_profile options[:profile_name]
+when 'profile-install'
+    Asca::Profiles.install_profile options[:profile_name]
+else
+    puts "Unsupported action: " + options[:action]
+end
