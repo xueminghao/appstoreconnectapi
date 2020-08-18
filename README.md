@@ -8,12 +8,26 @@ Every mac's ready for ruby out of the box!!!
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Install from rubygem.org
 
-```ruby
+``` sh
+gem install asca
+```
+
+Install from github
+
+``` sh
 gem install specific_install
 gem specific_install https://github.com/xueminghao/appstoreconnectapi.git
 ```
+
+## What you need
+
+1. App store connect key id
+1. App store connect issuer ID
+1. App store connect private key
+
+For more details for how and where to get these info, you can refer to the [App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi/generating_tokens_for_api_requests)
 
 ## Usage
 
