@@ -1,16 +1,25 @@
 require 'json'
 require 'jwt'
+require 'fileutils'
 
 module Asca
     class Token
         ROOTDIR = File.expand_path '~/.com.hurryup.asca'
         JSONFILE = File.expand_path 'config.json', ROOTDIR
+        EXPIRE_DURATION = 20 * 60
         class << self
+            # Generate new jwt token.
             def new_token
+                # get token from cache
+                token = get_token_from_cache
+                if token
+                    return token
+                end
+
                 # get kid
                 kid = get_config('kid')
                 if !kid
-                    puts "Please enter your kid:"
+                    puts "Before generating a jwt token, please enter your kid:"
                     kid = gets.chomp
                     update_config('kid', kid)
                 end
@@ -22,7 +31,7 @@ module Asca
                 # get issuer id
                 iss = get_config('iss')
                 if !iss
-                    puts "Please enter your issuer id:"
+                    puts "Before generating a jwt token, please enter your issuer id:"
                     iss = gets.chomp
                     update_config('iss', iss)
                 end
@@ -34,7 +43,7 @@ module Asca
                 # get private key
                 private_key = get_config('private_key')
                 if !private_key
-                    puts "Please enter your private key path:"
+                    puts "Before generating a jwt token, please enter your private key path:"
                     private_key_path = gets.chomp
                     private_key = File.read private_key_path
                     update_config('private_key', private_key)
@@ -52,7 +61,7 @@ module Asca
                 }
 
                 # generate jwt payload
-                exp = Time.now.to_i + 20 * 60
+                exp = Time.now.to_i + EXPIRE_DURATION
                 jwt_payload = {
                     "iss": iss,
                     "exp": exp,
@@ -62,30 +71,44 @@ module Asca
                 es_key = OpenSSL::PKey::EC.new private_key
 
                 token = JWT.encode jwt_payload, es_key, 'ES256', jwt_header
+                update_config('cache_token_time', exp)
+                update_config('cache_token', token)
                 puts "==== New token generated ===="
                 puts token
                 puts "============================="
                 return token
             end
-            # init config file
-            def init_config
-                # create root dir under home directory
-                if !File.exist?(ROOTDIR)
-                    Dir.mkdir ROOTDIR
+
+            def get_token_from_cache
+                cached_token_time = get_config('cache_token_time')
+                if !cached_token_time
+                    return nil
                 end
-                
-                if !File.exist?(JSONFILE)
-                    File.open(JSONFILE, 'w') { |file|
-                        file.write("{}")
-                    }
+                current = Time.now.to_i
+                if cached_token_time - current > EXPIRE_DURATION
+                    return nil
                 end
+                return get_config('cache_token')
+            end
+
+            # reset config file
+            def reset_config
+                # remove all
+                FileUtils.rm_rf(ROOTDIR)
+
+                # create root dir
+                Dir.mkdir ROOTDIR
+
+                # init config file
+                File.open(JSONFILE, 'w') { |file|
+                    file.write("{}")
+                }
             end
 
             # update config
             def update_config(key, value)
                 if !File.exist?(JSONFILE)
-                    puts 'Error: config file does not exist!'
-                    return -1
+                    reset_config
                 end
                 file_content = File.read(JSONFILE)
                 configuration = JSON.parse(file_content)
@@ -102,8 +125,7 @@ module Asca
             
             def get_config(key)
                 if !File.exist?(JSONFILE)
-                    puts 'Error: config file does not exist!'
-                    return -1
+                    reset_config
                 end
                 file_content = File.read(JSONFILE)
                 configuration = JSON.parse(file_content)
