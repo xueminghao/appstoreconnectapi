@@ -2,11 +2,16 @@ PATH
   remote: .
   specs:
     asca (0.1.0)
+      curb
+      json
+      jwt
 
 GEM
   remote: https://rubygems.org/
   specs:
+    curb (0.9.10)
     json (2.3.1)
+    jwt (2.2.2)
     minitest (5.14.1)
     rake (10.5.0)
 
@@ -16,7 +21,6 @@ PLATFORMS
 DEPENDENCIES
   asca!
   bundler (~> 2.0)
-  json
   minitest (~> 5.0)
   rake (~> 10.0)
 

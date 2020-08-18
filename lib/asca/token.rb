@@ -1,10 +1,72 @@
 require 'json'
+require 'jwt'
 
 module Asca
     class Token
         ROOTDIR = File.expand_path '~/.com.hurryup.asca'
         JSONFILE = File.expand_path 'config.json', ROOTDIR
         class << self
+            def new_token
+                # get kid
+                kid = get_config('kid')
+                if !kid
+                    puts "Please enter your kid:"
+                    kid = gets.chomp
+                    update_config('kid', kid)
+                end
+                if !kid
+                    puts "Error: no kid!"
+                    return
+                end
+
+                # get issuer id
+                iss = get_config('iss')
+                if !iss
+                    puts "Please enter your issuer id:"
+                    iss = gets.chomp
+                    update_config('iss', iss)
+                end
+                if !iss
+                    puts "Error: no issuer id!"
+                    return
+                end
+
+                # get private key
+                private_key = get_config('private_key')
+                if !private_key
+                    puts "Please enter your private key path:"
+                    private_key_path = gets.chomp
+                    private_key = File.read private_key_path
+                    update_config('private_key', private_key)
+                end
+                if !private_key
+                    puts "Error: no private key!"
+                    return
+                end
+                
+                # generate jwt header
+                jwt_header = {
+                    "alg": "ES256",
+                    "kid": kid,
+                    "typ": "JWT"
+                }
+
+                # generate jwt payload
+                exp = Time.now.to_i + 20 * 60
+                jwt_payload = {
+                    "iss": iss,
+                    "exp": exp,
+                    "aud": "appstoreconnect-v1"
+                }
+
+                es_key = OpenSSL::PKey::EC.new private_key
+
+                token = JWT.encode jwt_payload, es_key, 'ES256', jwt_header
+                puts "==== New token generated ===="
+                puts token
+                puts "============================="
+                return token
+            end
             # init config file
             def init_config
                 # create root dir under home directory
@@ -36,7 +98,17 @@ module Asca
                     file.write(JSON.pretty_generate(configuration))
                 }
                 return 0
-            end            
+            end
+            
+            def get_config(key)
+                if !File.exist?(JSONFILE)
+                    puts 'Error: config file does not exist!'
+                    return -1
+                end
+                file_content = File.read(JSONFILE)
+                configuration = JSON.parse(file_content)
+                return configuration[key]
+            end
         end
     end
 end
