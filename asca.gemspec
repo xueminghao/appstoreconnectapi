@@ -13,7 +13,6 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/xueminghao/appstoreconnectapi"
   spec.license       = "MIT"
 
-  spec.metadata["allowed_push_host"] = "https://github.com/xueminghao/appstoreconnectapi.git"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/xueminghao/appstoreconnectapi.git"
