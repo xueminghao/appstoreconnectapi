@@ -1,0 +1,24 @@
+PATH
+  remote: .
+  specs:
+    asca (0.1.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    json (2.3.1)
+    minitest (5.14.1)
+    rake (10.5.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  asca!
+  bundler (~> 2.0)
+  json
+  minitest (~> 5.0)
+  rake (~> 10.0)
+
+BUNDLED WITH
+   2.0.2
