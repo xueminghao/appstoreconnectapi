@@ -16,37 +16,37 @@ module Asca
                 # get kid
                 kid = Asca::Configuration.get_config('kid')
                 if !kid
-                    puts "Before generating a jwt token, please enter your kid:"
+                    Asca::Log.info "Before generating a jwt token, please enter your kid:"
                     kid = gets.chomp
                     Asca::Configuration.update_config('kid', kid)
                 end
                 if !kid
-                    puts "Error: no kid!"
+                    Asca::Log.error "Error: no kid!"
                     return
                 end
 
                 # get issuer id
                 iss = Asca::Configuration.get_config('iss')
                 if !iss
-                    puts "Before generating a jwt token, please enter your issuer id:"
+                    Asca::Log.info "Before generating a jwt token, please enter your issuer id:"
                     iss = gets.chomp
                     Asca::Configuration.update_config('iss', iss)
                 end
                 if !iss
-                    puts "Error: no issuer id!"
+                    Asca::Log.error "Error: no issuer id!"
                     return
                 end
 
                 # get private key
                 private_key = Asca::Configuration.get_config('private_key')
                 if !private_key
-                    puts "Before generating a jwt token, please enter your private key path:"
+                    Asca::Log.info "Before generating a jwt token, please enter your private key path:"
                     private_key_path = gets.chomp
                     private_key = File.read private_key_path
                     Asca::Configuration.update_config('private_key', private_key)
                 end
                 if !private_key
-                    puts "Error: no private key!"
+                    Asca::Log.error "Error: no private key!"
                     return
                 end
                 
@@ -65,14 +65,22 @@ module Asca
                     "aud": "appstoreconnect-v1"
                 }
 
-                es_key = OpenSSL::PKey::EC.new private_key
+                begin
+                    es_key = OpenSSL::PKey::EC.new private_key
+                rescue => exception
+                    Asca::Log.info "Invalid private key, please enter your correct private key path:"
+                    private_key_path = gets.chomp
+                    private_key = File.read private_key_path
+                    Asca::Configuration.update_config('private_key', private_key)
+                    es_key = OpenSSL::PKey::EC.new private_key
+                end
 
                 token = JWT.encode jwt_payload, es_key, 'ES256', jwt_header
                 Asca::Configuration.update_config('cache_token_time', exp)
                 Asca::Configuration.update_config('cache_token', token)
-                puts "==== New token generated ===="
-                puts token
-                puts "============================="
+                Asca::Log.info "==== New token generated ===="
+                Asca::Log.info token
+                Asca::Log.info "============================="
                 return token
             end
 
