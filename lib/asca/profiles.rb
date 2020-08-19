@@ -1,4 +1,4 @@
-require 'curb'
+require 'http'
 require 'json'
 require "base64"
 
@@ -14,13 +14,15 @@ module Asca
               Asca::Configuration.update_config('out_put_dir', out_put_dir)
           end
         end
-        http = Curl.get(URI_PROFILES, { 'filter[name]' => profile_name}) do |http|
-          http.headers['Authorization'] = ' Bearer ' + Asca::Token.new_token
-        end
-        profile_obj = JSON.parse(http.body_str)
-        profile_content = profile_obj["data"][0]["attributes"]['profileContent']
-        File.open(File.expand_path(profile_name + ".mobileprovision", out_put_dir), 'w') do |file|
-          file.write(Base64.decode64(profile_content))
+        response = HTTP.auth('Bearer ' + Asca::Token.new_token).get(URI_PROFILES, :params => { 'filter[name]' => profile_name })
+        if response.status.success?
+          profile_obj = JSON.parse(http.body_str)
+          profile_content = profile_obj["data"][0]["attributes"]['profileContent']
+          File.open(File.expand_path(profile_name + ".mobileprovision", out_put_dir), 'w') do |file|
+            file.write(Base64.decode64(profile_content))
+          end
+        else
+          Log.error(response.body)
         end
       end
 
