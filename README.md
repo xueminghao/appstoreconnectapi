@@ -1,5 +1,8 @@
 # Asca
 
+[![GitHub license](https://img.shields.io/github/license/xueminghao/appstoreconnectapi)](https://github.com/xueminghao/appstoreconnectapi/blob/master/LICENSE.txt)
+[![Gem](https://img.shields.io/gem/v/asca)](https://rubygems.org/gems/asca)
+
 An apple app store connect api wrapper based on ruby!!!
 
 Why ruby?
