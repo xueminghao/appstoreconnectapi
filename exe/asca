@@ -12,19 +12,29 @@ options = {}
 option_parser = OptionParser.new do |opts|
   opts.banner = 'This is an apple connect api wrapper cli.'
 
-  opts.on('-a action-name', '--action action-name', 'profile-install, profile-download') do |value|
+  opts.on('-a action-name', '--action action-name', 'version, profile-install, profile-download') do |value|
     options[:action] = value
   end
   opts.on('-n name', '--name name', 'Profile name') do |value|
     options[:profile_name] = value
   end
+  opts.on('-v', '--version', 'Get current version') do |value|
+    options[:action] = 'version'
+  end
 end.parse!
 
 case options[:action]
+when 'version'
+  Asca::Log.info(Asca::VERSION)
 when 'profile-download'
-    Asca::Profiles.download_profile options[:profile_name]
+  Asca::Profiles.download_profile options[:profile_name]
 when 'profile-install'
-    Asca::Profiles.install_profile options[:profile_name]
+  Asca::Profiles.install_profile options[:profile_name]
 else
+  if options[:action]
     puts "Unsupported action: " + options[:action]
+  else
+    puts Asca::Log.error('Wrong parameters')
+  end
+
 end

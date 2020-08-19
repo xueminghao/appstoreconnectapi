@@ -1,4 +1,5 @@
 require "asca/version"
+require "asca/log.rb"
 require "asca/consts.rb"
 require "asca/configuration.rb"
 require "asca/token"
