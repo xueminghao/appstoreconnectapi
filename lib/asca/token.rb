@@ -77,15 +77,15 @@ module Asca
             end
 
             def get_token_from_cache
-                cached_token_time = Asca::Configuration.get_config('cache_token_time')
-                if !cached_token_time
+                token_valid_max_time = Asca::Configuration.get_config('cache_token_time')
+                if !token_valid_max_time
                     return nil
                 end
                 current = Time.now.to_i
-                if cached_token_time - current > EXPIRE_DURATION
-                    return nil
+                if token_valid_max_time > current
+                    return Asca::Configuration.get_config('cache_token')
                 end
-                return Asca::Configuration.get_config('cache_token')
+                return nil
             end
         end
     end

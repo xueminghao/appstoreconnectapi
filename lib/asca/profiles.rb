@@ -16,7 +16,7 @@ module Asca
         end
         response = HTTP.auth('Bearer ' + Asca::Token.new_token).get(URI_PROFILES, :params => { 'filter[name]' => profile_name })
         if response.status.success?
-          profile_obj = JSON.parse(http.body_str)
+          profile_obj = JSON.parse(response.body)
           profile_content = profile_obj["data"][0]["attributes"]['profileContent']
           File.open(File.expand_path(profile_name + ".mobileprovision", out_put_dir), 'w') do |file|
             file.write(Base64.decode64(profile_content))
