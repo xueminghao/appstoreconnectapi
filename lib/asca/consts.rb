@@ -8,4 +8,5 @@ module Asca
 
     URI_PROFILES = url_for_path('v1/profiles')
     URI_DEVICES = url_for_path('v1/devices')
+    URI_CERTIFICATES = url_for_path('v1/certificates')
 end
