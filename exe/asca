@@ -12,11 +12,15 @@ options = {}
 option_parser = OptionParser.new do |opts|
   opts.banner = 'This is an apple connect api wrapper cli.'
 
-  opts.on('-a action-name', '--action action-name', 'version, profile-install, profile-download') do |value|
+  opts.on('-a action-name', '--action action-name', 'version, profile-install, profile-download, device-list, device-register') do |value|
     options[:action] = value
   end
-  opts.on('-n name', '--name name', 'Profile name') do |value|
+  opts.on('-n name', '--name name', 'Profile or device name') do |value|
     options[:profile_name] = value
+    options[:device_name] = value
+  end
+  opts.on('--udid udid', 'device udid') do |value|
+    options[:udid] = value
   end
   opts.on('-v', '--version', 'Get current version') do |value|
     options[:action] = 'version'
@@ -30,6 +34,10 @@ when 'profile-download'
   Asca::Profiles.download_profile options[:profile_name]
 when 'profile-install'
   Asca::Profiles.install_profile options[:profile_name]
+when 'device-list'
+  Asca::Devices.list_devices
+when 'device-register'
+  Asca::Devices.register_new_device options[:udid] options[:device_name]
 else
   if options[:action]
     puts "Unsupported action: " + options[:action]

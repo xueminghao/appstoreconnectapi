@@ -7,4 +7,5 @@ module Asca
     end
 
     URI_PROFILES = url_for_path('v1/profiles')
+    URI_DEVICES = url_for_path('v1/devices')
 end
