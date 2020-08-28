@@ -33,6 +33,82 @@ module Asca
         # install profile
         `open #{profile_file_path}`
       end
+
+      # notion: bundle_id is not bundle identifier and device id is udid。They are the corresponding api id.
+      def create_new_profile(options = {})
+        if !options[:name]
+          Asca::Log.error('No profile name specified')
+          return false
+        end
+        if !options[:type]
+          Asca::Log.error('No type specified')
+          return false
+        end
+        if !options[:bundle_id]
+          Asca::Log.error('No bundle id specfied')
+          return false
+        end
+        if !options[:certificate_ids] || options[:certificate_ids].length == 0
+          Asca::Log.error('No certificate id specified')
+          return false
+        end
+
+        response = HTTP.auth('Bearer ' + Asca::Token.new_token).post(URI_PROFILES, :json => { "data" => {
+          "type" => "profiles",
+          "attributes" => {
+              "name" => options[:name],
+              "profileType" => options[:type],
+          },
+          "relationships" => {
+            "bundleId" => {
+              "data" => {
+                "type" => "bundleIds",
+                "id" => options[:bundle_id],
+              }
+            },
+            "certificates" => {
+              "data" => options[:certificate_ids].map { |certificate_id| { "type" => "certificates", "id" => certificate_id }}
+            },
+            "devices" => {
+              "data" => options[:device_ids] ? options[:device_ids].map { |device_id| { "type" => "devices", "id" => device_id } } : nil
+            },
+          }
+        }})
+        if response.status.success?
+            puts response.body
+            return true
+        else
+            puts response.body
+            return false
+        end        
+      end
+
+      def delete_profile(options = {})
+        # query profile id
+        response = HTTP.auth('Bearer ' + Asca::Token.new_token).get(URI_PROFILES, :params => { 'filter[name]' => options[:name] })
+        if response.status.success?
+          responseObj = JSON.parse(response.body)
+          queried_profile_list = responseObj["data"]
+          if queried_profile_list.length() > 0
+            profile_id = queried_profile_list[0]["id"]
+          end
+        else
+          Log.error(response.body)
+          return
+        end
+        if !profile_id
+          puts "No profile named #{options[:name]} found!"
+          return
+        end
+
+        # delete profile
+        response = HTTP.auth('Bearer ' + Asca::Token.new_token).delete(URI_PROFILES + "/#{profile_id}")
+        if response.status.success?
+          Log.info("Profile named #{options[:name]} deleted successfully!")
+        else
+          puts response.body
+        end
+      end
     end
   end
 end

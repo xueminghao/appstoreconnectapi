@@ -6,6 +6,6 @@ class DeviceTest < Minitest::Test
     end
     
     def test_register_new_device
-        Asca::Devices.register_new_device "00008030-001E2C1C3480802E", "test_register_new_device"
+        Asca::Devices.register_new_device "00008030-000E49261A29802E", "hu meifang's new iphoe"
     end
 end

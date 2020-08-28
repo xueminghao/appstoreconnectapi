@@ -6,6 +6,7 @@ require "asca/token"
 require "asca/profiles.rb"
 require "asca/devices.rb"
 require "asca/certificates.rb"
+require "asca/bundleids.rb"
 
 module Asca
   class Error < StandardError; end
