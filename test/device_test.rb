@@ -6,6 +6,6 @@ class DeviceTest < Minitest::Test
     end
     
     def test_register_new_device
-        Asca::Devices.register_new_device "00008030-000E49261A29802E", "hu meifang's new iphoe"
+        Asca::Devices.register_new_device :udid => "00008030-000E49261A29802E", :name => "hu meifang's new iphoe"
     end
 end

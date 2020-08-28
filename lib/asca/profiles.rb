@@ -75,12 +75,11 @@ module Asca
           }
         }})
         if response.status.success?
-            puts response.body
             return true
         else
             puts response.body
             return false
-        end        
+        end      
       end
 
       def delete_profile(options = {})
@@ -108,6 +107,42 @@ module Asca
         else
           puts response.body
         end
+        return response.status.success?
+      end
+
+      # update profile. The new profile is almost the same as the old one, such as the same name, bundle id, certificate ids, with only exception that the new one always try to include all the currently reigstered devices.
+      def update_profile(options = {}) 
+        # query profile info
+        response = HTTP.auth('Bearer ' + Asca::Token.new_token).get(URI_PROFILES, :params => { 'filter[name]' => options[:name] })
+        if response.status.success?
+          responseObj = JSON.parse(response.body)
+          queried_profile_list = responseObj["data"]
+          if queried_profile_list.length() > 0
+            profile = queried_profile_list[0]
+          end
+        else
+          Log.error(response.body)
+          return
+        end
+
+        # create new profile
+        profile_type = profile["attributes"]["profileType"]
+
+        # get bundle id
+        response = HTTP.auth('Bearer ' + Asca::Token.new_token).get(profile["relationships"]["bundleId"]["links"]["self"])
+        bundle_id = JSON.parse(response.body)["data"]["id"]
+        response = HTTP.auth('Bearer ' + Asca::Token.new_token).get(profile["relationships"]["certificates"]["links"]["self"])
+        certificate_ids = JSON.parse(response.body)["data"].map { |cer| cer["id"] }
+
+        device_ids = Asca::Devices.list_devices.map { |device|
+          device["id"]
+        }
+
+        # delete old prifile
+        delete_profile :name => options[:name]
+        
+        create_new_profile :name => options[:name], :type => profile_type, :bundle_id => bundle_id, :device_ids => device_ids, :certificate_ids => certificate_ids
+        return true
       end
     end
   end
