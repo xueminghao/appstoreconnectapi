@@ -14,10 +14,9 @@ module Asca
 
                 Asca::Devices.register_new_device :udid => device_info[:udid], :name => device_info[:name]
 
-                # profile_names.each { |profile_name|
-                #     Asca::Profiles.delete_profile :name => profile_name
-                #     Asca::Profiles.create_new_profile :name => profile_name,
-                # }
+                profile_names.each { |profile_name|
+                    Asca::Profiles.update_profile :name => profile_name
+                }
             end
         end
     end
