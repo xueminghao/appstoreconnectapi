@@ -143,6 +143,7 @@ module Asca
             response = HTTP.auth('Bearer ' + Asca::Tools::Token.new_token).get(profile["relationships"]["certificates"]["links"]["self"])
             certificate_ids = JSON.parse(response.body)["data"].map { |cer| cer["id"] }
     
+            # get all device ids
             device_ids = Asca::REST::Provisioning::Devices.list_devices.map { |device|
               device["id"]
             }
@@ -150,7 +151,12 @@ module Asca
             # delete old prifile
             delete_profile :name => options[:name]
             
-            create_new_profile :name => options[:name], :type => profile_type, :bundle_id => bundle_id, :device_ids => device_ids, :certificate_ids => certificate_ids
+            if profile_type.include? 'APP_STORE'
+              create_new_profile :name => options[:name], :type => profile_type, :bundle_id => bundle_id, :certificate_ids => certificate_ids
+            else
+              create_new_profile :name => options[:name], :type => profile_type, :bundle_id => bundle_id, :device_ids => device_ids, :certificate_ids => certificate_ids
+            end
+            
             return true
           end
         end
