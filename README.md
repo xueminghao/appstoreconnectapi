@@ -34,22 +34,29 @@ For more details for how and where to get these info, you can refer to the [App 
 
 ## Usage
 
-* Download provisioning files by name from developer account
+First of all, one should setup a its credentials as described above. Then you can ever call basic REST apis or call the useful tools. To call a tools use --tools [tool-name], to call a api use --api [api-name]
+
+* Register device tool. Which register a new device to your current team and update the specified provisioning files
 
 ```ruby
-asca -a profile-download -n [profile-name]
+asca --tools register-device -a profile-download -n [profile-name]
 ```
 
-* Download & install provisioning files by name from developer account
+* Download provisioning file tool. Which download specified provisioning file to local disk and install it as needed
 
 ```ruby
-asca -a profile-install -n [profile-name]
+asca --tools download-profile --name [profile-name] --auto-install
+```
+
+* Call device get api, you can call list the all registered devices.
+
+```ruby
+asca --api device --method get
 ```
 
 ## TODO
 
-Support more actions such as device management
-
+Fulfill all of the REST apis
 
 ## Contributing
 

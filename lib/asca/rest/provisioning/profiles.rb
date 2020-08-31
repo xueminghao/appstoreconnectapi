@@ -26,7 +26,7 @@ module Asca
                 file.write(Base64.decode64(profile_content))
               end
             else
-              Log.error(response.body)
+              Asca::Tools::Log.error(response.body)
             end
           end
     
@@ -42,19 +42,19 @@ module Asca
           # notion: bundle_id is not bundle identifier and device id is udid。They are the corresponding api id.
           def create_new_profile(options = {})
             if !options[:name]
-              Asca::Tools::Log.error('No profile name specified')
+              Asca::Tools::Asca::Tools::Log.error('No profile name specified')
               return false
             end
             if !options[:type]
-              Asca::Tools::Log.error('No type specified')
+              Asca::Tools::Asca::Tools::Log.error('No type specified')
               return false
             end
             if !options[:bundle_id]
-              Asca::Tools::Log.error('No bundle id specfied')
+              Asca::Tools::Asca::Tools::Log.error('No bundle id specfied')
               return false
             end
             if !options[:certificate_ids] || options[:certificate_ids].length == 0
-              Asca::Tools::Log.error('No certificate id specified')
+              Asca::Tools::Asca::Tools::Log.error('No certificate id specified')
               return false
             end
     
@@ -97,7 +97,7 @@ module Asca
                 profile_id = queried_profile_list[0]["id"]
               end
             else
-              Log.error(response.body)
+              Asca::Tools::Log.error(response.body)
               return
             end
             if !profile_id
@@ -108,7 +108,7 @@ module Asca
             # delete profile
             response = HTTP.auth('Bearer ' + Asca::Tools::Token.new_token).delete(URI_PROFILES + "/#{profile_id}")
             if response.status.success?
-              Log.info("Profile named #{options[:name]} deleted successfully!")
+              Asca::Tools::Log.info("Profile named #{options[:name]} deleted successfully!")
             else
               puts response.body
             end
@@ -126,10 +126,14 @@ module Asca
                 profile = queried_profile_list[0]
               end
             else
-              Log.error(response.body)
+              Asca::Tools::Log.error(response.body)
               return
             end
-    
+            
+            if !profile
+              Asca::Tools::Log.error("No profile named #{options[:name]} found")
+              return
+            end
             # create new profile
             profile_type = profile["attributes"]["profileType"]
     

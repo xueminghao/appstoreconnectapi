@@ -10,39 +10,71 @@ require 'optparse'
 
 options = {}
 option_parser = OptionParser.new do |opts|
-  opts.banner = 'This is an apple connect api wrapper cli.'
+  opts.banner = 'This is an apple connect api wrapper cli. It wraps most of the apple store connect REST api and also supplement some useful tools based on these apis. For how to use it, refer to https://github.com/xueminghao/appstoreconnectapi plase.'
 
-  opts.on('-a action-name', '--action action-name', 'version, profile-install, profile-download, device-list, device-register') do |value|
-    options[:action] = value
+  opts.on('--tools tool-name', 'Call a specific tool by name. such as register-device') do |value|
+    options[:tool_name] = value
   end
-  opts.on('-n name', '--name name', 'Profile or device name') do |value|
-    options[:profile_name] = value
-    options[:device_name] = value
+  
+  opts.on('-a api-name', '--api api-name', 'api name') do |value|
+    options[:api_name] = value
   end
-  opts.on('--udid udid', 'device udid') do |value|
+
+  opts.on('-m method', '--method method', 'api request method') do |value|
+    options[:method] = value
+  end
+
+  opts.on('-n name', '--name name', 'tool or api parameter: name') do |value|
+    options[:name] = value
+  end
+  opts.on('--udid udid', 'tool or api parameter: device udid') do |value|
     options[:udid] = value
   end
-  opts.on('-v', '--version', 'Get current version') do |value|
-    options[:action] = 'version'
+  opts.on('--profile-names profile-name-array', 'tool or api parameter: profile name list') do |value|
+    options[:profile_names] = value.split(',')
+  end
+  opts.on('--auto-install', 'tool or api parameter: auto install the downloaded profiles') do
+    options[:auto_install] = true
+  end
+  opts.on('-v', '--version', 'current version') do |value|
+    options[:version] = 'version'
   end
 end.parse!
 
-case options[:action]
-when 'version'
-  Asca::Tools::Log.info(Asca::VERSION)
-when 'profile-download'
-  Asca::REST::Provisioning::Profiles.download_profile :name => options[:profile_name]
-when 'profile-install'
-  Asca::REST::Provisioning::Profiles.install_profile :name => options[:profile_name]
-when 'device-list'
-  Asca::REST::Provisioning::Devices.list_devices
-when 'device-register'
-  Asca::REST::Provisioning::Devices.register_new_device options[:udid] options[:device_name]
-else
-  if options[:action]
-    puts "Unsupported action: " + options[:action]
-  else
-    puts Asca::Tools::Log.error('Wrong parameters')
-  end
+tool_name = options[:tool_name]
+api_name = options[:api_name]
 
+if tool_name
+  case tool_name
+  when 'register-device'
+    Asca::Tools.register_device :device_info => { :udid => options[:udid], :name => options[:name] }, :profile_names => options[:profile_names]
+  when 'download-profile'
+    if options[:auto_install]
+      Asca::REST::Provisioning::Profiles.install_profile :name => options[:name]
+    else
+      Asca::REST::Provisioning::Profiles.download_profile :name => options[:name]
+    end
+  else
+    Asca::Tools::Log.error("Unsupported tool name: #{tool_name}")
+  end
+elsif api_name
+  method = options[:method]
+  method = method ? method : 'get'
+  case api_name  
+  when 'device'
+    case method
+    when 'get'
+      Asca::REST::Provisioning::Devices.list_devices
+    when 'post'
+      Asca::REST::Provisioning::Devices.register_new_device options[:udid], options[:name]
+    else
+      Asca::Tools::Log.error("Unsupported request method #{method} for api #{api_name}, coming soon!!")
+    end
+  else
+    Asca::Tools::Log.error("Unsupported api request #{api_name}, coming soon!!")
+  end
+elsif options[:version]
+  Asca::Tools::Log.info(Asca::VERSION)
+else
+  puts Asca::Tools::Log.error('Wrong parameters')
 end

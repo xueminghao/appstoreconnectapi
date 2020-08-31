@@ -8,6 +8,7 @@ module Asca
             device_info = options[:device_info]
             profile_names = options[:profile_names]
             if !device_info || !profile_names
+                Asca::Tools::Log.error('Wrong parameters for register device')
                 return
             end
 
