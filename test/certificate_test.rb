@@ -3,10 +3,10 @@ require "test_helper"
 class CertificateTest < Minitest::Test
     def test_list_certificates
         puts 'Request all certificates'
-        assert Asca::Certificates.list_certificates
+        assert Asca::REST::Provisioning::Certificates.list_certificates
         puts "Request dev certificates only"
-        assert Asca::Certificates.list_certificates "DEVELOPMENT"
+        assert Asca::REST::Provisioning::Certificates.list_certificates :typ => "DEVELOPMENT"
         puts "Request relese certificates only"
-        assert Asca::Certificates.list_certificates "DISTRIBUTION"
+        assert Asca::REST::Provisioning::Certificates.list_certificates :type => "DISTRIBUTION"
     end
 end

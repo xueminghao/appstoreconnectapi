@@ -29,20 +29,20 @@ end.parse!
 
 case options[:action]
 when 'version'
-  Asca::Log.info(Asca::VERSION)
+  Asca::Tools::Log.info(Asca::VERSION)
 when 'profile-download'
-  Asca::Profiles.download_profile options[:profile_name]
+  Asca::REST::Provisioning::Profiles.download_profile :name => options[:profile_name]
 when 'profile-install'
-  Asca::Profiles.install_profile options[:profile_name]
+  Asca::REST::Provisioning::Profiles.install_profile :name => options[:profile_name]
 when 'device-list'
-  Asca::Devices.list_devices
+  Asca::REST::Provisioning::Devices.list_devices
 when 'device-register'
-  Asca::Devices.register_new_device options[:udid] options[:device_name]
+  Asca::REST::Provisioning::Devices.register_new_device options[:udid] options[:device_name]
 else
   if options[:action]
     puts "Unsupported action: " + options[:action]
   else
-    puts Asca::Log.error('Wrong parameters')
+    puts Asca::Tools::Log.error('Wrong parameters')
   end
 
 end
