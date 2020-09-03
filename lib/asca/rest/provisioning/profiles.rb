@@ -36,7 +36,8 @@ module Asca
             profile_file_path = File.expand_path(profile_name + ".mobileprovision", Asca::Tools::Configuration::CACHE_DIR)
     
             # install profile
-            `open #{profile_file_path}`
+            FileUtils.cp(profile_file_path, File.expand_path('~/Library/MobileDevice/Provisioning Profiles'))
+            Asca::Tools::Log.info("#{profile_name} installed successfully!")
           end
     
           # notion: bundle_id is not bundle identifier and device id is udid。They are the corresponding api id.

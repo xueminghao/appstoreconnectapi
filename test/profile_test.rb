@@ -16,4 +16,8 @@ class AscaTest < Minitest::Test
     assert true
   end
 
+  def test_install_profile
+    Asca::REST::Provisioning::Profiles.install_profile :name => 'test-debug'
+    assert true
+  end
 end
