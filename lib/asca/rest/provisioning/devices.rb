@@ -30,6 +30,7 @@ module Asca
                         if response.status.success?
                             return true
                         else
+                            Asca::Tools::Log.error(response.body)
                             return false
                         end
                     end

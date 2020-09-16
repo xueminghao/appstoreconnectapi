@@ -66,7 +66,7 @@ elsif api_name
     when 'get'
       Asca::REST::Provisioning::Devices.list_devices
     when 'post'
-      Asca::REST::Provisioning::Devices.register_new_device options[:udid], options[:name]
+      Asca::REST::Provisioning::Devices.register_new_device :udid => options[:udid], :name => options[:name]
     else
       Asca::Tools::Log.error("Unsupported request method #{method} for api #{api_name}, coming soon!!")
     end
