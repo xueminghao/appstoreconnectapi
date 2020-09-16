@@ -54,6 +54,12 @@ asca --tools download-profile --name [profile-name] --auto-install
 asca --api device --method get
 ```
 
+* Register a device only
+
+```ruby
+asca --api device --method post --udid [udid] --name [device_name]
+```
+
 ## TODO
 
 Fulfill all of the REST apis
