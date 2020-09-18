@@ -39,7 +39,7 @@ First of all, one should setup a its credentials as described above. Then you ca
 * Register device tool. Which register a new device to your current team and update the specified provisioning files
 
 ```ruby
-asca --tools register-device -a profile-download -n [profile-name]
+asca --tool register-device --udid [udid] --name [device-name] --profile-names [profile-names]
 ```
 
 * Download provisioning file tool. Which download specified provisioning file to local disk and install it as needed
@@ -57,7 +57,7 @@ asca --api device --method get
 * Register a device only
 
 ```ruby
-asca --api device --method post --udid [udid] --name [device_name]
+asca --api device --method post --udid [udid] --name [device-name]
 ```
 
 ## TODO
